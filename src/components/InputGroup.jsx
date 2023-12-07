@@ -1,24 +1,80 @@
-import Input from './Input';
 import {useState} from "react";
+import {calculateInvestmentResults} from "../util/investment";
 
-export default function InputGroup({inputOne, inputTwo}) {
-    const [formData, setFormData] = useState({})
+export default function InputGroup({getResult}) {
+    const [formData, setFormData] = useState({
+        initialInvestment: null,
+        annualInvestment: null,
+        expectedReturn: null,
+        duration: null
+    })
+
+    function cleanError() {
+        const labels = document.querySelectorAll('.input-group label')
+        labels.forEach(val => {
+            if (val.classList.contains('empty-field')){
+                val.classList.remove('empty-field');
+            }
+        })
+    }
+
+    function checkData(obj) {
+        cleanError();
+        let error = false;
+        for(let key in obj) {
+            if(!obj[key]) {
+                document.querySelector(`input[name=${key}]`).parentNode.classList.add('empty-field');
+                error = true;
+            }
+        }
+        if(!error) {
+            return true
+        }
+
+    }
+
+    function checkValue(val) {
+        return val? val: '';
+    }
+
     function handleSubmit(e) {
         e.preventDefault();
-        console.log(formData);
+        if(checkData(formData)) {
+            getResult(calculateInvestmentResults(formData));
+        }
     }
     function handleChange(e) {
-        const {title, value} = e.target;
+        const {name, value} = e.target;
         setFormData((prevData) => ({
             ...prevData,
-            [title]: value
+            [name]: +value
         } ))
     }
-
     return (
-        <form className="input-group" onSubmit={handleSubmit}>
-            <Input key={inputOne[0]} title={inputOne[0]} name={inputOne[1]} handleChange={handleChange} />
-            <Input key={inputTwo[0]} title={inputTwo[0]} name={inputTwo[1]} handleChange={handleChange} />
+        <form onSubmit={handleSubmit}>
+            <div className="input-group">
+                <label >Initial Investment
+                    <input className='empty-field' type="number" name='initialInvestment' value={checkValue(formData.initialInvestment)} onChange={handleChange}/>
+                    <p className='error'>Please fill out this field</p>
+                </label>
+
+                <label >Annual Investment
+                    <input type="number" name='annualInvestment' value={checkValue(formData.annualInvestment)} onChange={handleChange}/>
+                    <p className='error'>Please fill out this field</p>
+                </label>
+            </div>
+            <div className="input-group">
+                <label >Expected Return
+                    <input type="number" name='expectedReturn' value={checkValue(formData.expectedReturn)} onChange={handleChange}/>
+                    <p className='error'>Please fill out this field</p>
+                </label>
+
+                <label >Duration
+                    <input type="number" name='duration' value={checkValue(formData.duration)} onChange={handleChange}/>
+                    <p className='error'>Please fill out this field</p>
+                </label>
+            </div>
+            <button type='submit' style={{display: 'none'}}>Submit</button>
         </form>
     );
 }

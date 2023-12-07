@@ -1,11 +1,13 @@
 import {formatter} from '../util/investment'
 export default function Result({obj}) {
-
+    function roundingValue(val) {
+        return Math.round(val*100)/100
+    }
     if(!obj) return false;
     const result = obj.map(val => <tr>
         <td>{val.year}</td>
-        <td>{val.interest}</td>
-        <td>{formatter.format(val.valueEndOfYear)}</td>
+        <td>{roundingValue(val.interest)}</td>
+        <td>{formatter.format(roundingValue(val.valueEndOfYear))}</td>
         <td>{val.annualInvestment}</td>
     </tr> )
     return (
